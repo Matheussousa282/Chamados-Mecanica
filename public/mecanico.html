@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Gestão de Mecânicos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #0f2027;
+    color: #fff;
+}
+
+header {
+    background: #203a43;
+    padding: 15px 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.container {
+    max-width: 900px;
+    margin: 20px auto;
+    background: #ffffff;
+    color: #333;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+.form {
+    display: grid;
+    grid-template-columns: 2fr 1fr auto;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input, select {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-add {
+    background: #203a43;
+    color: #fff;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+}
+
+th {
+    background: #f4f4f4;
+}
+
+.status-ativo {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.status-inativo {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.btn-ativar {
+    background: #2ecc71;
+    color: #fff;
+}
+
+.btn-inativar {
+    background: #e74c3c;
+    color: #fff;
+}
+</style>
+</head>
+
+<body>
+
+<header>🧑‍🔧 Gestão de Mecânicos</header>
+
+<div class="container">
+    <h2>Cadastrar Mecânico</h2>
+
+    <div class="form">
+        <input type="text" id="nome" placeholder="Nome do mecânico">
+        <select id="funcao">
+            <option value="">Função</option>
+            <option>Costura</option>
+            <option>Corte</option>
+            <option>Geral</option>
+        </select>
+        <button class="btn-add" onclick="cadastrar()">Adicionar</button>
+    </div>
+
+    <h2>Lista de Mecânicos</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Função</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="lista"></tbody>
+    </table>
+</div>
+
+<script>
+let mecanicos = [];
+
+function cadastrar() {
+    const nome = document.getElementById("nome").value.trim();
+    const funcao = document.getElementById("funcao").value;
+
+    if (!nome || !funcao) {
+        alert("Preencha nome e função");
+        return;
+    }
+
+    mecanicos.push({
+        nome,
+        funcao,
+        ativo: true
+    });
+
+    document.getElementById("nome").value = "";
+    document.getElementById("funcao").value = "";
+
+    render();
+}
+
+function alternarStatus(index) {
+    mecanicos[index].ativo = !mecanicos[index].ativo;
+    render();
+}
+
+function render() {
+    const lista = document.getElementById("lista");
+    lista.innerHTML = "";
+
+    mecanicos.forEach((m, i) => {
+        lista.innerHTML += `
+            <tr>
+                <td>${m.nome}</td>
+                <td>${m.funcao}</td>
+                <td class="${m.ativo ? 'status-ativo' : 'status-inativo'}">
+                    ${m.ativo ? 'ATIVO' : 'INATIVO'}
+                </td>
+                <td>
+                    <button 
+                        class="${m.ativo ? 'btn-inativar' : 'btn-ativar'}"
+                        onclick="alternarStatus(${i})">
+                        ${m.ativo ? 'Inativar' : 'Ativar'}
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+render();
+</script>
+
+</body>
+</html>

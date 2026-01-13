@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Avançado - Manutenção</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #0f2027;
+    color: #fff;
+}
+
+header {
+    background: #203a43;
+    padding: 15px 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.filtros {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+    background: #162d35;
+    flex-wrap: wrap;
+}
+
+select {
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 15px;
+    padding: 15px;
+}
+
+.card {
+    background: #fff;
+    color: #333;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.card h3 {
+    margin: 0 0 10px 0;
+}
+
+.status {
+    font-weight: bold;
+}
+
+.aberto { color: #e74c3c; }
+.atendimento { color: #f39c12; }
+.finalizado { color: #2ecc71; }
+
+.info {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+</style>
+</head>
+
+<body>
+
+<header>🔧 Dashboard de Chamados</header>
+
+<div class="filtros">
+    <select id="filtroGalpao" onchange="render()">
+        <option value="">Todos os Galpões</option>
+        <option>A</option>
+        <option>B</option>
+    </select>
+
+    <select id="filtroStatus" onchange="render()">
+        <option value="">Todos os Status</option>
+        <option value="aberto">Aberto</option>
+        <option value="atendimento">Em Atendimento</option>
+        <option value="finalizado">Finalizado</option>
+    </select>
+
+    <select id="filtroMecanico" onchange="render()">
+        <option value="">Todos os Mecânicos</option>
+        <option>João</option>
+        <option>Carlos</option>
+    </select>
+</div>
+
+<div class="container" id="lista"></div>
+
+<script>
+let chamados = [
+    {
+        id: 1,
+        galpao: "A",
+        supervisor: "Carlos",
+        grupo: "Costura 03",
+        maquina: "Reta 12",
+        mecanico: "João",
+        status: "aberto"
+    },
+    {
+        id: 2,
+        galpao: "B",
+        supervisor: "Mariana",
+        grupo: "Costura 01",
+        maquina: "Overlock 3",
+        mecanico: "Carlos",
+        status: "atendimento"
+    }
+];
+
+function render() {
+    const galpao = filtroGalpao.value;
+    const status = filtroStatus.value;
+    const mecanico = filtroMecanico.value;
+
+    const lista = document.getElementById("lista");
+    lista.innerHTML = "";
+
+    chamados
+        .filter(c =>
+            (!galpao || c.galpao === galpao) &&
+            (!status || c.status === status) &&
+            (!mecanico || c.mecanico === mecanico)
+        )
+        .forEach(c => {
+            lista.innerHTML += `
+                <div class="card">
+                    <h3>${c.maquina}</h3>
+                    <div class="info"><strong>Galpão:</strong> ${c.galpao}</div>
+                    <div class="info"><strong>Supervisor:</strong> ${c.supervisor}</div>
+                    <div class="info"><strong>Grupo:</strong> ${c.grupo}</div>
+                    <div class="info"><strong>Mecânico:</strong> ${c.mecanico || "Não atribuído"}</div>
+                    <div class="status ${c.status}">
+                        Status: ${c.status.toUpperCase()}
+                    </div>
+                </div>
+            `;
+        });
+}
+
+render();
+</script>
+
+</body>
+</html>

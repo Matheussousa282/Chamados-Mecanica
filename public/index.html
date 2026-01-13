@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Chamado de Manutenção - Costura</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #203a43;
+            font-size: 22px;
+        }
+
+        .header p {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: none;
+            height: 80px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #203a43;
+            color: #fff;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #0f2027;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🔧 Chamado de Manutenção</h1>
+        <p>Informe o problema da máquina</p>
+    </div>
+
+    <form id="chamadoForm">
+
+         <label for="supervisor">Supervisor</label>
+        <input type="text" id="supervisor" placeholder="Nome do supervisor" required>
+        
+        <label for="galpao">Galpão</label>
+        <select id="galpao" required>
+            <option value="">Selecione</option>
+            <option>Galpão A</option>
+            <option>Galpão B</option>
+            <option>Galpão C</option>
+        </select>
+
+       
+
+        <label for="grupo">Grupo</label>
+        <input type="text" id="grupo" placeholder="Ex: Costura 03" required>
+
+        <label for="equipamento">Equipamento</label>
+        <input type="text" id="equipamento" placeholder="Ex: Reta 12" required>
+
+        <label for="descricao">Descrição do Problema</label>
+        <textarea id="descricao" placeholder="Descreva o defeito (opcional)"></textarea>
+
+        <button type="submit">🚨 Enviar Chamado</button>
+    </form>
+
+    <div class="footer">
+        Sistema de Manutenção • Costura
+    </div>
+</div>
+
+<script>
+    document.getElementById("chamadoForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const dados = {
+            galpao: document.getElementById("galpao").value,
+            supervisor: document.getElementById("supervisor").value,
+            grupo: document.getElementById("grupo").value,
+            equipamento: document.getElementById("equipamento").value,
+            descricao: document.getElementById("descricao").value
+        };
+
+        console.log(dados);
+
+        alert("Chamado enviado com sucesso! 🚀");
+
+        // Depois: enviar esses dados para o backend (API)
+        this.reset();
+    });
+</script>
+
+</body>
+</html>
