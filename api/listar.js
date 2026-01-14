@@ -1,4 +1,4 @@
-const pool = require("../lib/db");
+import pool from "../lib/db";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -7,15 +7,21 @@ export default async function handler(req, res) {
 
   try {
     const result = await pool.query(`
-      SELECT *
+      SELECT
+        id,
+        supervisor,
+        galpao,
+        grupo,
+        maquina,
+        descricao,
+        criado_em
       FROM chamados_producao
       ORDER BY criado_em DESC
-      LIMIT 50
     `);
 
-    res.status(200).json(result.rows);
+    return res.status(200).json(result.rows);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Erro ao buscar chamados" });
+    return res.status(500).json({ error: "Erro ao buscar chamados" });
   }
 }
