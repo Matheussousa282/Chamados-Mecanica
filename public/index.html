@@ -289,12 +289,12 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const data = {
-    supervisor: document.getElementById("supervisor").value,
-    galpao_id: Number(galpaoSelect.value),
-    grupo_id: Number(grupoSelect.value),
-    maquina_id: Number(maquinaSelect.value),
-    descricao: document.getElementById("descricao").value,
-  };
+  supervisor: document.getElementById("supervisor").value,
+  galpao: galpaoSelect.options[galpaoSelect.selectedIndex].text,
+  grupo: grupoSelect.options[grupoSelect.selectedIndex].text,
+  maquina: maquinaSelect.options[maquinaSelect.selectedIndex].text,
+  descricao: document.getElementById("descricao").value,
+};
 
   const response = await fetch("/api/chamados", {
     method: "POST",
