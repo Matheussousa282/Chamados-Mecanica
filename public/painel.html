@@ -6,93 +6,148 @@
 <title>Painel de Chamados - Produção</title>
 
 <style>
-    body {
-        font-family: "Segoe UI", Roboto, Arial, sans-serif;
-        background: #eef1f5;
-        margin: 0;
-    }
+:root {
+    --bg: #eef1f5;
+    --card: #ffffff;
+    --primary: #2563eb;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --novo: #e0f2fe;
+}
 
-    .container {
-        max-width: 1200px;
-        margin: auto;
-        padding: 20px;
-    }
+* {
+    box-sizing: border-box;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
 
-    h1 {
-        margin-bottom: 20px;
-        color: #1f2937;
-    }
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+}
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        background: #fff;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+/* ================= HEADER ================= */
+header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 20px;
+}
+
+/* ================= CONTAINER ================= */
+.container {
+    max-width: 1300px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* ================= CARD ================= */
+.card {
+    background: var(--card);
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+/* ================= TABLE ================= */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+th, td {
+    padding: 14px;
+    text-align: left;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+th {
+    background: #f9fafb;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+tr:hover {
+    background: #f3f4f6;
+}
+
+tr.novo {
+    background: var(--novo);
+    animation: pulse 1.5s infinite;
+}
+
+/* ================= ANIMATION ================= */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+
+    header h1 {
+        font-size: 18px;
     }
 
     th, td {
-        padding: 14px;
-        text-align: left;
-        border-bottom: 1px solid #e5e7eb;
-        font-size: 14px;
+        padding: 12px;
+        font-size: 13px;
     }
 
-    th {
-        background: #f9fafb;
-        font-weight: 600;
-    }
-
-    tr:hover {
-        background: #f3f4f6;
-    }
-
-    .novo {
-        background-color: #e0f2fe;
-        animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-        0% { opacity: 1; }
-        50% { opacity: 0.6; }
-        100% { opacity: 1; }
-    }
+}
 </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>📋 Painel de Chamados - Produção</h1>
+<header>
+    <h1>📋 Painel de Chamados – Produção</h1>
+</header>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Supervisor</th>
-                <th>Galpão</th>
-                <th>Grupo</th>
-                <th>Máquina</th>
-                <th>Descrição</th>
-                <th>Data</th>
-            </tr>
-        </thead>
-        <tbody id="listaChamados"></tbody>
-    </table>
+<div class="container">
+    <div class="card">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Supervisor</th>
+                        <th>Galpão</th>
+                        <th>Grupo</th>
+                        <th>Máquina</th>
+                        <th>Descrição</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody id="listaChamados"></tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <audio id="alertSound" src="/sounds/chamado.mp3" preload="auto"></audio>
-
 
 <script>
 let ultimoChamadoId = null;
 let audioLiberado = false;
 
 const audio = document.getElementById("alertSound");
+audio.volume = 1.0;
 
-// volume de 0.0 a 1.0
-audio.volume = 1.0; // volume máximo
-
-
+// ================= CARREGAR CHAMADOS =================
 async function carregarChamados() {
     const res = await fetch("/api/listar");
     const chamados = await res.json();
@@ -130,40 +185,52 @@ async function carregarChamados() {
     }
 }
 
+// ================= ALERTA =================
 function dispararAlerta(chamado) {
-    // Notificação visual
+
     if (Notification.permission === "granted") {
         new Notification("📢 Novo Chamado de Produção", {
             body: `Máquina: ${chamado.maquina} | Galpão: ${chamado.galpao}`,
         });
     }
 
-    // Alerta sonoro repetido
     if (audioLiberado) {
-        tocarAlertaRepetido(3, 3000); // 3 vezes, a cada 3 segundos
+        repetirSom(3, 3000);
     }
 }
 
+// ================= SOM REPETIDO =================
+function repetirSom(vezes, intervalo) {
+    let count = 0;
 
-// Libera áudio após interação do usuário
+    const timer = setInterval(() => {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+        count++;
+
+        if (count >= vezes) clearInterval(timer);
+    }, intervalo);
+}
+
+// ================= LIBERAR AUDIO =================
 document.addEventListener("click", () => {
     if (!audioLiberado) {
         audio.play().then(() => {
             audio.pause();
             audio.currentTime = 0;
             audioLiberado = true;
-            console.log("🔊 Áudio liberado");
         }).catch(() => {});
     }
 }, { once: true });
 
-// Permissão de notificação
+// ================= NOTIFICAÇÃO =================
 if (Notification.permission !== "granted") {
     Notification.requestPermission();
 }
 
 carregarChamados();
-setInterval(carregarChamados, 10000); // 10 segundos
+setInterval(carregarChamados, 10000);
 </script>
+
 </body>
 </html>

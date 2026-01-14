@@ -1,226 +1,220 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chamado para Produção</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abertura de Chamado - Produção</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: "Segoe UI", Roboto, Arial, sans-serif;
-        }
+<style>
+:root {
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+}
 
-        body {
-            margin: 0;
-            background-color: #eef1f5;
-        }
+* {
+    box-sizing: border-box;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
 
-        .page {
-            max-width: 900px;
-            margin: auto;
-            padding: 20px;
-        }
+body {
+    margin: 0;
+    background: linear-gradient(180deg, #eaf0ff, var(--bg));
+    color: var(--text);
+}
 
-        .card {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-            padding: 30px;
-        }
+/* ================= CONTAINER ================= */
+.page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
 
-        .header {
-            border-bottom: 1px solid #e0e0e0;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-        }
+/* ================= CARD ================= */
+.card {
+    background: var(--card);
+    width: 100%;
+    max-width: 920px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    overflow: hidden;
+}
 
-        .header h1 {
-            margin: 0;
-            font-size: 22px;
-            color: #1f2937;
-        }
+/* ================= HEADER ================= */
+.header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    padding: 24px 30px;
+}
 
-        .header p {
-            margin: 6px 0 0;
-            color: #6b7280;
-            font-size: 14px;
-        }
+.header h1 {
+    margin: 0;
+    font-size: 22px;
+}
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
+.header p {
+    margin: 6px 0 0;
+    opacity: 0.9;
+    font-size: 14px;
+}
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
+/* ================= FORM ================= */
+.form {
+    padding: 30px;
+}
 
-        .form-group.full {
-            grid-column: span 2;
-        }
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+}
 
-        label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 6px;
-        }
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
 
-        input, select, textarea {
-            padding: 12px;
-            font-size: 15px;
-            border-radius: 8px;
-            border: 1px solid #d1d5db;
-            outline: none;
-            background-color: #fff;
-            transition: border 0.2s, box-shadow 0.2s;
-        }
+.form-group.full {
+    grid-column: span 2;
+}
 
-        input:focus, select:focus, textarea:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-        }
+label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--muted);
+}
 
-        textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
+input, select, textarea {
+    padding: 14px;
+    font-size: 15px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+}
 
-        .actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 30px;
-        }
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
 
-        button {
-            background-color: #2563eb;
-            color: #ffffff;
-            border: none;
-            padding: 14px 26px;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-        }
+textarea {
+    resize: vertical;
+    min-height: 120px;
+}
 
-        button:hover {
-            background-color: #1e40af;
-            transform: translateY(-1px);
-        }
+/* ================= ACTIONS ================= */
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
 
-        /* ========================= */
-        /*        MOBILE             */
-        /* ========================= */
-        @media (max-width: 768px) {
+button {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    border: none;
+    padding: 14px 34px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.2s;
+}
 
-            .card {
-                padding: 20px;
-            }
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(37,99,235,0.35);
+}
 
-            .header h1 {
-                font-size: 20px;
-            }
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
 
-            .form-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
+    .form {
+        padding: 22px;
+    }
 
-            .form-group.full {
-                grid-column: span 1;
-            }
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
 
-            input, select, textarea {
-                font-size: 16px; /* melhor para toque */
-            }
+    .form-group.full {
+        grid-column: span 1;
+    }
 
-            .actions {
-                justify-content: stretch;
-            }
-
-            button {
-                width: 100%;
-                padding: 16px;
-                font-size: 16px;
-            }
-        }
-    </style>
+    button {
+        width: 100%;
+        padding: 16px;
+        font-size: 16px;
+    }
+}
+</style>
 </head>
 <body>
 
 <div class="page">
     <div class="card">
+
         <div class="header">
-            <h1>Chamado para Produção</h1>
-            <p>Preencha as informações para abertura do chamado</p>
+            <h1>🛠️ Abertura de Chamado – Produção</h1>
+            <p>Informe os dados para acionar a equipe responsável</p>
         </div>
 
-        <form>
+        <form class="form">
+
             <div class="form-grid">
 
                 <div class="form-group">
-                    <label for="supervisor">Supervisor</label>
+                    <label>Supervisor</label>
                     <input type="text" id="supervisor" placeholder="Nome do supervisor" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="galpao">Galpão</label>
-                    <select id="galpao" required>
-                           <option value="">Selecione o galpão</option>
-                           <option value="Galpão 1">Galpão 1</option>
-                           <option value="Galpão 2">Galpão 2</option>
-                           <option value="Galpão 3">Galpão 3</option>
-                    </select>
+                    <label>Galpão</label>
+                    <select id="galpao" required></select>
                 </div>
 
                 <div class="form-group">
-                    <label for="grupo">Grupo</label>
-                    <select id="grupo" required>
-                            <option value="">Selecione o grupo</option>
-                            <option value="Grupo A">Grupo A</option>
-                            <option value="Grupo B">Grupo B</option>
-                            <option value="Grupo C">Grupo C</option>
-                    </select>
+                    <label>Grupo</label>
+                    <select id="grupo" required></select>
                 </div>
 
                 <div class="form-group">
-                    <label for="maquina">Máquina</label>
-                    <select id="maquina" required>
-                            <option value="">Selecione a máquina</option>
-                            <option value="Máquina 01">Máquina 01</option>
-                            <option value="Máquina 02">Máquina 02</option>
-                            <option value="Máquina 03">Máquina 03</option>
-                    </select>
+                    <label>Máquina</label>
+                    <select id="maquina" required></select>
                 </div>
 
                 <div class="form-group full">
-                    <label for="descricao">Descrição do Problema</label>
-                    <textarea id="descricao" placeholder="Descreva o problema ocorrido" required></textarea>
+                    <label>Descrição do problema</label>
+                    <textarea id="descricao" placeholder="Descreva detalhadamente o problema ocorrido" required></textarea>
                 </div>
 
             </div>
 
             <div class="actions">
-                <button type="submit">Abrir Chamado</button>
+                <button type="submit">🚨 Abrir Chamado</button>
             </div>
+
         </form>
     </div>
 </div>
 
 <script>
 const form = document.querySelector("form");
-
 const galpaoSelect = document.getElementById("galpao");
 const grupoSelect = document.getElementById("grupo");
 const maquinaSelect = document.getElementById("maquina");
 
-// ==========================
 // CARREGAR GALPÕES
-// ==========================
 async function carregarGalpoes() {
   const res = await fetch("/api/galpoes");
   const galpoes = await res.json();
@@ -230,15 +224,11 @@ async function carregarGalpoes() {
   maquinaSelect.innerHTML = `<option value="">Selecione a máquina</option>`;
 
   galpoes.forEach(g => {
-    galpaoSelect.innerHTML += `
-      <option value="${g.id}">${g.nome}</option>
-    `;
+    galpaoSelect.innerHTML += `<option value="${g.id}">${g.nome}</option>`;
   });
 }
 
-// ==========================
-// CARREGAR GRUPOS (POR GALPÃO)
-// ==========================
+// CARREGAR GRUPOS
 async function carregarGrupos(galpaoId) {
   grupoSelect.innerHTML = `<option value="">Selecione o grupo</option>`;
   maquinaSelect.innerHTML = `<option value="">Selecione a máquina</option>`;
@@ -249,71 +239,53 @@ async function carregarGrupos(galpaoId) {
   const grupos = await res.json();
 
   grupos.forEach(g => {
-    grupoSelect.innerHTML += `
-      <option value="${g.id}">${g.nome}</option>
-    `;
+    grupoSelect.innerHTML += `<option value="${g.id}">${g.nome}</option>`;
   });
 }
 
-// ==========================
-// CARREGAR MÁQUINAS (POR GRUPO)
-// ==========================
+// CARREGAR MÁQUINAS
 async function carregarMaquinas(grupoId) {
   maquinaSelect.innerHTML = `<option value="">Selecione a máquina</option>`;
-
   if (!grupoId) return;
 
   const res = await fetch(`/api/maquinas?grupo_id=${grupoId}`);
   const maquinas = await res.json();
 
   maquinas.forEach(m => {
-    maquinaSelect.innerHTML += `
-      <option value="${m.id}">${m.nome}</option>
-    `;
+    maquinaSelect.innerHTML += `<option value="${m.id}">${m.nome}</option>`;
   });
 }
 
-// EVENTOS DE DEPENDÊNCIA
-galpaoSelect.addEventListener("change", e => {
-  carregarGrupos(e.target.value);
-});
+galpaoSelect.addEventListener("change", e => carregarGrupos(e.target.value));
+grupoSelect.addEventListener("change", e => carregarMaquinas(e.target.value));
 
-grupoSelect.addEventListener("change", e => {
-  carregarMaquinas(e.target.value);
-});
-
-// ==========================
-// SUBMIT DO CHAMADO
-// ==========================
-form.addEventListener("submit", async (e) => {
+// SUBMIT
+form.addEventListener("submit", async e => {
   e.preventDefault();
 
   const data = {
-  supervisor: document.getElementById("supervisor").value,
-  galpao: galpaoSelect.options[galpaoSelect.selectedIndex].text,
-  grupo: grupoSelect.options[grupoSelect.selectedIndex].text,
-  maquina: maquinaSelect.options[maquinaSelect.selectedIndex].text,
-  descricao: document.getElementById("descricao").value,
-};
+    supervisor: supervisor.value,
+    galpao: galpaoSelect.options[galpaoSelect.selectedIndex].text,
+    grupo: grupoSelect.options[grupoSelect.selectedIndex].text,
+    maquina: maquinaSelect.options[maquinaSelect.selectedIndex].text,
+    descricao: descricao.value,
+  };
 
-  const response = await fetch("/api/chamados", {
+  const res = await fetch("/api/chamados", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    body: JSON.stringify(data)
   });
 
-  const result = await response.json();
-
-  if (response.ok) {
+  if (res.ok) {
     alert("Chamado aberto com sucesso!");
     form.reset();
     carregarGalpoes();
   } else {
-    alert(result.error || "Erro ao abrir chamado");
+    alert("Erro ao abrir chamado");
   }
 });
 
-// INIT
 carregarGalpoes();
 </script>
 
