@@ -1,4 +1,4 @@
-import pool from "../../../lib/db";
+const pool = require("../lib/db");
 
 export default async function handler(req, res) {
   const { id } = req.query;
