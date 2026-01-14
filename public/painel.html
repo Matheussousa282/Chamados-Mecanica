@@ -80,7 +80,7 @@
     </table>
 </div>
 
-<audio id="alertSound" src="/sounds/alerta.mp3" preload="auto"></audio>
+<audio id="alertSound" src="/sounds/chamado.mp3" preload="auto"></audio>
 
 
 <script>
@@ -88,6 +88,10 @@ let ultimoChamadoId = null;
 let audioLiberado = false;
 
 const audio = document.getElementById("alertSound");
+
+// volume de 0.0 a 1.0
+audio.volume = 1.0; // volume máximo
+
 
 async function carregarChamados() {
     const res = await fetch("/api/listar");
@@ -134,12 +138,12 @@ function dispararAlerta(chamado) {
         });
     }
 
-    // Alerta sonoro
+    // Alerta sonoro repetido
     if (audioLiberado) {
-        audio.currentTime = 0;
-        audio.play().catch(() => {});
+        tocarAlertaRepetido(3, 3000); // 3 vezes, a cada 3 segundos
     }
 }
+
 
 // Libera áudio após interação do usuário
 document.addEventListener("click", () => {
