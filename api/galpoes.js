@@ -1,6 +1,6 @@
-import pool from "../../../lib/db";
+const pool = require("../lib/db");
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   try {
     if (req.method === "GET") {
       const result = await pool.query(
@@ -18,16 +18,18 @@ export default async function handler(req, res) {
 
       const result = await pool.query(
         "INSERT INTO galpoes (nome, descricao) VALUES ($1, $2) RETURNING *",
-        [nome, descricao]
+        [nome, descricao || null]
       );
 
       return res.status(201).json(result.rows[0]);
     }
 
     return res.status(405).json({ error: "Método não permitido" });
-
-  } catch (error) {
-    console.error("ERRO API GALPÕES:", error);
-    return res.status(500).json({ error: "Erro interno do servidor" });
+  } catch (err) {
+    console.error("ERRO GALPÕES:", err);
+    return res.status(500).json({
+      error: "Erro interno",
+      detalhe: err.message
+    });
   }
-}
+};
