@@ -5,33 +5,36 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Método não permitido" });
   }
 
-  const {
-    supervisor,
-    galpao_id,
-    grupo_id,
-    maquina_id,
-    descricao
-  } = req.body;
-
-  if (!supervisor || !galpao_id || !grupo_id || !maquina_id || !descricao) {
-    return res.status(400).json({ error: "Dados obrigatórios ausentes" });
-  }
-
   try {
+    const {
+      supervisor,
+      galpao,
+      grupo,
+      maquina,
+      descricao
+    } = req.body;
+
+    if (!supervisor || !galpao || !grupo || !maquina || !descricao) {
+      return res.status(400).json({ error: "Dados obrigatórios ausentes" });
+    }
+
     const result = await pool.query(
       `
-      INSERT INTO chamados
-      (supervisor, galpao_id, grupo_id, maquina_id, descricao)
+      INSERT INTO chamados_producao
+      (supervisor, galpao, grupo, maquina, descricao)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING *
       `,
-      [supervisor, galpao_id, grupo_id, maquina_id, descricao]
+      [supervisor, galpao, grupo, maquina, descricao]
     );
 
-    res.status(201).json(result.rows[0]);
+    return res.status(201).json(result.rows[0]);
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erro ao criar chamado" });
+  } catch (error) {
+    console.error("ERRO CHAMADO PRODUÇÃO:", error);
+    return res.status(500).json({
+      error: "Erro interno ao criar chamado",
+      detalhe: error.message
+    });
   }
 }
