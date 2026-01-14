@@ -212,34 +212,110 @@
 </div>
 
 <script>
-  const form = document.querySelector("form");
+const form = document.querySelector("form");
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+const galpaoSelect = document.getElementById("galpao");
+const grupoSelect = document.getElementById("grupo");
+const maquinaSelect = document.getElementById("maquina");
 
-    const data = {
-      supervisor: document.getElementById("supervisor").value,
-      galpao: document.getElementById("galpao").value,
-      grupo: document.getElementById("grupo").value,
-      maquina: document.getElementById("maquina").value,
-      descricao: document.getElementById("descricao").value,
-    };
+// ==========================
+// CARREGAR GALPÕES
+// ==========================
+async function carregarGalpoes() {
+  const res = await fetch("/api/galpoes");
+  const galpoes = await res.json();
 
-    const response = await fetch("/api/chamados", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+  galpaoSelect.innerHTML = `<option value="">Selecione o galpão</option>`;
+  grupoSelect.innerHTML = `<option value="">Selecione o grupo</option>`;
+  maquinaSelect.innerHTML = `<option value="">Selecione a máquina</option>`;
 
-    const result = await response.json();
-
-    if (response.ok) {
-      alert("Chamado aberto com sucesso!");
-      form.reset();
-    } else {
-      alert(result.error || "Erro ao abrir chamado");
-    }
+  galpoes.forEach(g => {
+    galpaoSelect.innerHTML += `
+      <option value="${g.id}">${g.nome}</option>
+    `;
   });
+}
+
+// ==========================
+// CARREGAR GRUPOS (POR GALPÃO)
+// ==========================
+async function carregarGrupos(galpaoId) {
+  grupoSelect.innerHTML = `<option value="">Selecione o grupo</option>`;
+  maquinaSelect.innerHTML = `<option value="">Selecione a máquina</option>`;
+
+  if (!galpaoId) return;
+
+  const res = await fetch(`/api/grupos?galpao_id=${galpaoId}`);
+  const grupos = await res.json();
+
+  grupos.forEach(g => {
+    grupoSelect.innerHTML += `
+      <option value="${g.id}">${g.nome}</option>
+    `;
+  });
+}
+
+// ==========================
+// CARREGAR MÁQUINAS (POR GRUPO)
+// ==========================
+async function carregarMaquinas(grupoId) {
+  maquinaSelect.innerHTML = `<option value="">Selecione a máquina</option>`;
+
+  if (!grupoId) return;
+
+  const res = await fetch(`/api/maquinas?grupo_id=${grupoId}`);
+  const maquinas = await res.json();
+
+  maquinas.forEach(m => {
+    maquinaSelect.innerHTML += `
+      <option value="${m.id}">${m.nome}</option>
+    `;
+  });
+}
+
+// EVENTOS DE DEPENDÊNCIA
+galpaoSelect.addEventListener("change", e => {
+  carregarGrupos(e.target.value);
+});
+
+grupoSelect.addEventListener("change", e => {
+  carregarMaquinas(e.target.value);
+});
+
+// ==========================
+// SUBMIT DO CHAMADO
+// ==========================
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const data = {
+    supervisor: document.getElementById("supervisor").value,
+    galpao_id: Number(galpaoSelect.value),
+    grupo_id: Number(grupoSelect.value),
+    maquina_id: Number(maquinaSelect.value),
+    descricao: document.getElementById("descricao").value,
+  };
+
+  const response = await fetch("/api/chamados", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+
+  if (response.ok) {
+    alert("Chamado aberto com sucesso!");
+    form.reset();
+    carregarGalpoes();
+  } else {
+    alert(result.error || "Erro ao abrir chamado");
+  }
+});
+
+// INIT
+carregarGalpoes();
 </script>
+
 </body>
 </html>
