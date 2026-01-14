@@ -180,15 +180,18 @@ async function carregarMaquinas() {
         lista.innerHTML += `
             <tr>
                 <td>${m.nome}</td>
-                <td>${m.grupo}</td>
-                <td>${m.galpao}</td>
+                <td>${m.grupo_nome}</td>
+                <td>${m.galpao_nome}</td>
                 <td class="actions">
-                    <button onclick="editar(${m.id}, ${m.galpao_id}, ${m.grupo_id}, '${m.nome}')">Editar</button>
+                    <button onclick="editar(${m.id}, ${m.galpao_id}, ${m.grupo_id}, '${m.nome}')">
+                        Editar
+                    </button>
                 </td>
             </tr>
         `;
     });
 }
+
 
 // SALVAR / EDITAR
 document.getElementById("formMaquina").addEventListener("submit", async e => {
