@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadastro de Galpão</title>
+
+<style>
+    body {
+        font-family: "Segoe UI", Roboto, Arial, sans-serif;
+        background: #eef1f5;
+        margin: 0;
+    }
+
+    .container {
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .card {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+    }
+
+    h1 {
+        margin-bottom: 20px;
+        color: #1f2937;
+    }
+
+    label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        font-size: 15px;
+    }
+
+    button {
+        padding: 10px 16px;
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    button.secondary {
+        background: #6b7280;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: left;
+        font-size: 14px;
+    }
+
+    th {
+        background: #f9fafb;
+    }
+
+    tr:hover {
+        background: #f3f4f6;
+    }
+
+    .actions button {
+        margin-right: 5px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- FORMULÁRIO -->
+    <div class="card">
+        <h1 id="titulo">Cadastro de Galpão</h1>
+
+        <form id="formGalpao">
+            <input type="hidden" id="galpaoId">
+
+            <label>Nome do Galpão</label>
+            <input type="text" id="nome" placeholder="Ex: Galpão A" required>
+
+            <label>Descrição</label>
+            <textarea id="descricao" rows="3" placeholder="Descrição do galpão"></textarea>
+
+            <button type="submit">Salvar</button>
+            <button type="button" class="secondary" onclick="cancelarEdicao()" style="display:none" id="btnCancelar">
+                Cancelar
+            </button>
+        </form>
+    </div>
+
+    <!-- LISTAGEM -->
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="listaGalpoes"></tbody>
+    </table>
+
+</div>
+
+<script>
+const form = document.getElementById("formGalpao");
+const lista = document.getElementById("listaGalpoes");
+const galpaoIdInput = document.getElementById("galpaoId");
+const nomeInput = document.getElementById("nome");
+const descricaoInput = document.getElementById("descricao");
+const btnCancelar = document.getElementById("btnCancelar");
+const titulo = document.getElementById("titulo");
+
+// LISTAR
+async function carregarGalpoes() {
+    const res = await fetch("/api/galpoes");
+    const galpoes = await res.json();
+
+    lista.innerHTML = "";
+
+    galpoes.forEach(g => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${g.nome}</td>
+            <td>${g.descricao || ""}</td>
+            <td class="actions">
+                <button onclick="editar(${g.id}, '${g.nome}', '${g.descricao || ""}')">Editar</button>
+            </td>
+        `;
+
+        lista.appendChild(tr);
+    });
+}
+
+// SALVAR / ATUALIZAR
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const data = {
+        nome: nomeInput.value,
+        descricao: descricaoInput.value
+    };
+
+    let url = "/api/galpoes";
+    let method = "POST";
+
+    if (galpaoIdInput.value) {
+        url = `/api/galpoes/${galpaoIdInput.value}`;
+        method = "PUT";
+    }
+
+    const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        form.reset();
+        galpaoIdInput.value = "";
+        btnCancelar.style.display = "none";
+        titulo.innerText = "Cadastro de Galpão";
+        carregarGalpoes();
+    } else {
+        alert("Erro ao salvar galpão");
+    }
+});
+
+// EDITAR
+function editar(id, nome, descricao) {
+    galpaoIdInput.value = id;
+    nomeInput.value = nome;
+    descricaoInput.value = descricao;
+    titulo.innerText = "Editar Galpão";
+    btnCancelar.style.display = "inline-block";
+}
+
+// CANCELAR
+function cancelarEdicao() {
+    form.reset();
+    galpaoIdInput.value = "";
+    titulo.innerText = "Cadastro de Galpão";
+    btnCancelar.style.display = "none";
+}
+
+carregarGalpoes();
+</script>
+
+</body>
+</html>

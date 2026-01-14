@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Chamados - Produção</title>
+
+<style>
+    body {
+        font-family: "Segoe UI", Roboto, Arial, sans-serif;
+        background: #eef1f5;
+        margin: 0;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: auto;
+        padding: 20px;
+    }
+
+    h1 {
+        margin-bottom: 20px;
+        color: #1f2937;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    th, td {
+        padding: 14px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+    }
+
+    th {
+        background: #f9fafb;
+        font-weight: 600;
+    }
+
+    tr:hover {
+        background: #f3f4f6;
+    }
+
+    .novo {
+        background-color: #e0f2fe;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📋 Painel de Chamados - Produção</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Supervisor</th>
+                <th>Galpão</th>
+                <th>Grupo</th>
+                <th>Máquina</th>
+                <th>Descrição</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody id="listaChamados"></tbody>
+    </table>
+</div>
+
+<audio id="alertSound" src="/sounds/alerta.mp3" preload="auto"></audio>
+
+
+<script>
+let ultimoChamadoId = null;
+let audioLiberado = false;
+
+const audio = document.getElementById("alertSound");
+
+async function carregarChamados() {
+    const res = await fetch("/api/chamados/listar");
+    const chamados = await res.json();
+
+    const tbody = document.getElementById("listaChamados");
+    tbody.innerHTML = "";
+
+    chamados.forEach(chamado => {
+        const tr = document.createElement("tr");
+
+        if (ultimoChamadoId && chamado.id > ultimoChamadoId) {
+            tr.classList.add("novo");
+        }
+
+        tr.innerHTML = `
+            <td>${chamado.supervisor}</td>
+            <td>${chamado.galpao}</td>
+            <td>${chamado.grupo}</td>
+            <td>${chamado.maquina}</td>
+            <td>${chamado.descricao}</td>
+            <td>${new Date(chamado.criado_em).toLocaleString()}</td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+
+    if (chamados.length > 0) {
+        const maisRecente = chamados[0];
+
+        if (ultimoChamadoId && maisRecente.id > ultimoChamadoId) {
+            dispararAlerta(maisRecente);
+        }
+
+        ultimoChamadoId = maisRecente.id;
+    }
+}
+
+function dispararAlerta(chamado) {
+    // Notificação visual
+    if (Notification.permission === "granted") {
+        new Notification("📢 Novo Chamado de Produção", {
+            body: `Máquina: ${chamado.maquina} | Galpão: ${chamado.galpao}`,
+        });
+    }
+
+    // Alerta sonoro
+    if (audioLiberado) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+    }
+}
+
+// Libera áudio após interação do usuário
+document.addEventListener("click", () => {
+    if (!audioLiberado) {
+        audio.play().then(() => {
+            audio.pause();
+            audio.currentTime = 0;
+            audioLiberado = true;
+            console.log("🔊 Áudio liberado");
+        }).catch(() => {});
+    }
+}, { once: true });
+
+// Permissão de notificação
+if (Notification.permission !== "granted") {
+    Notification.requestPermission();
+}
+
+carregarChamados();
+setInterval(carregarChamados, 10000); // 10 segundos
+</script>
+</body>
+</html>

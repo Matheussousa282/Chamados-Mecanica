@@ -2,153 +2,244 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Chamado de Manutenção - Costura</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chamado para Produção</title>
 
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", Roboto, Arial, sans-serif;
         }
 
-        .container {
+        body {
+            margin: 0;
+            background-color: #eef1f5;
+        }
+
+        .page {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .card {
             background: #ffffff;
-            width: 100%;
-            max-width: 420px;
-            padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            padding: 30px;
         }
 
         .header {
-            text-align: center;
-            margin-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
         }
 
         .header h1 {
             margin: 0;
-            color: #203a43;
             font-size: 22px;
+            color: #1f2937;
         }
 
         .header p {
-            margin-top: 5px;
+            margin: 6px 0 0;
+            color: #6b7280;
             font-size: 14px;
-            color: #666;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full {
+            grid-column: span 2;
         }
 
         label {
-            font-weight: bold;
             font-size: 14px;
-            color: #333;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
         }
 
-        select, input, textarea {
-            width: 100%;
+        input, select, textarea {
             padding: 12px;
-            margin-top: 6px;
-            margin-bottom: 15px;
+            font-size: 15px;
             border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 14px;
+            border: 1px solid #d1d5db;
+            outline: none;
+            background-color: #fff;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
         }
 
         textarea {
-            resize: none;
-            height: 80px;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 30px;
         }
 
         button {
-            width: 100%;
-            padding: 15px;
-            background: #203a43;
-            color: #fff;
-            font-size: 16px;
+            background-color: #2563eb;
+            color: #ffffff;
             border: none;
-            border-radius: 8px;
+            padding: 14px 26px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
+            transition: background 0.2s, transform 0.1s;
         }
 
         button:hover {
-            background: #0f2027;
+            background-color: #1e40af;
+            transform: translateY(-1px);
         }
 
-        .footer {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 12px;
-            color: #777;
+        /* ========================= */
+        /*        MOBILE             */
+        /* ========================= */
+        @media (max-width: 768px) {
+
+            .card {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .form-group.full {
+                grid-column: span 1;
+            }
+
+            input, select, textarea {
+                font-size: 16px; /* melhor para toque */
+            }
+
+            .actions {
+                justify-content: stretch;
+            }
+
+            button {
+                width: 100%;
+                padding: 16px;
+                font-size: 16px;
+            }
         }
     </style>
 </head>
-
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>🔧 Chamado de Manutenção</h1>
-        <p>Informe o problema da máquina</p>
-    </div>
+<div class="page">
+    <div class="card">
+        <div class="header">
+            <h1>Chamado para Produção</h1>
+            <p>Preencha as informações para abertura do chamado</p>
+        </div>
 
-    <form id="chamadoForm">
+        <form>
+            <div class="form-grid">
 
-         <label for="supervisor">Supervisor</label>
-        <input type="text" id="supervisor" placeholder="Nome do supervisor" required>
-        
-        <label for="galpao">Galpão</label>
-        <select id="galpao" required>
-            <option value="">Selecione</option>
-            <option>Galpão A</option>
-            <option>Galpão B</option>
-            <option>Galpão C</option>
-        </select>
+                <div class="form-group">
+                    <label for="supervisor">Supervisor</label>
+                    <input type="text" id="supervisor" placeholder="Nome do supervisor" required>
+                </div>
 
-       
+                <div class="form-group">
+                    <label for="galpao">Galpão</label>
+                    <select id="galpao" required>
+                        <option value="">Selecione o galpão</option>
+                        <option>Galpão 1</option>
+                        <option>Galpão 2</option>
+                        <option>Galpão 3</option>
+                    </select>
+                </div>
 
-        <label for="grupo">Grupo</label>
-        <input type="text" id="grupo" placeholder="Ex: Costura 03" required>
+                <div class="form-group">
+                    <label for="grupo">Grupo</label>
+                    <select id="grupo" required>
+                        <option value="">Selecione o grupo</option>
+                        <option>Grupo A</option>
+                        <option>Grupo B</option>
+                        <option>Grupo C</option>
+                    </select>
+                </div>
 
-        <label for="equipamento">Equipamento</label>
-        <input type="text" id="equipamento" placeholder="Ex: Reta 12" required>
+                <div class="form-group">
+                    <label for="maquina">Máquina</label>
+                    <select id="maquina" required>
+                        <option value="">Selecione a máquina</option>
+                        <option>Máquina 01</option>
+                        <option>Máquina 02</option>
+                        <option>Máquina 03</option>
+                    </select>
+                </div>
 
-        <label for="descricao">Descrição do Problema</label>
-        <textarea id="descricao" placeholder="Descreva o defeito (opcional)"></textarea>
+                <div class="form-group full">
+                    <label for="descricao">Descrição do Problema</label>
+                    <textarea id="descricao" placeholder="Descreva o problema ocorrido" required></textarea>
+                </div>
 
-        <button type="submit">🚨 Enviar Chamado</button>
-    </form>
+            </div>
 
-    <div class="footer">
-        Sistema de Manutenção • Costura
+            <div class="actions">
+                <button type="submit">Abrir Chamado</button>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
-    document.getElementById("chamadoForm").addEventListener("submit", function(e) {
-        e.preventDefault();
+  const form = document.querySelector("form");
 
-        const dados = {
-            galpao: document.getElementById("galpao").value,
-            supervisor: document.getElementById("supervisor").value,
-            grupo: document.getElementById("grupo").value,
-            equipamento: document.getElementById("equipamento").value,
-            descricao: document.getElementById("descricao").value
-        };
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-        console.log(dados);
+    const data = {
+      supervisor: document.getElementById("supervisor").value,
+      galpao: document.getElementById("galpao").value,
+      grupo: document.getElementById("grupo").value,
+      maquina: document.getElementById("maquina").value,
+      descricao: document.getElementById("descricao").value,
+    };
 
-        alert("Chamado enviado com sucesso! 🚀");
-
-        // Depois: enviar esses dados para o backend (API)
-        this.reset();
+    const response = await fetch("/api/chamados", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
     });
-</script>
 
+    const result = await response.json();
+
+    if (response.ok) {
+      alert("Chamado aberto com sucesso!");
+      form.reset();
+    } else {
+      alert(result.error || "Erro ao abrir chamado");
+    }
+  });
+</script>
 </body>
 </html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadastro de Máquina</title>
+
+<style>
+    body {
+        font-family: "Segoe UI", Roboto, Arial, sans-serif;
+        background: #eef1f5;
+        margin: 0;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .card {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+    }
+
+    h1 {
+        margin-bottom: 20px;
+        color: #1f2937;
+    }
+
+    label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        font-size: 15px;
+    }
+
+    button {
+        padding: 10px 16px;
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    button.secondary {
+        background: #6b7280;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: left;
+        font-size: 14px;
+    }
+
+    th {
+        background: #f9fafb;
+    }
+
+    tr:hover {
+        background: #f3f4f6;
+    }
+
+    .actions button {
+        margin-right: 5px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- FORMULÁRIO -->
+    <div class="card">
+        <h1 id="titulo">Cadastro de Máquina</h1>
+
+        <form id="formMaquina">
+            <input type="hidden" id="maquinaId">
+
+            <label>Galpão</label>
+            <select id="galpao" required></select>
+
+            <label>Grupo</label>
+            <select id="grupo" required></select>
+
+            <label>Nome da Máquina</label>
+            <input type="text" id="nome" placeholder="Ex: Máquina 05" required>
+
+            <button type="submit">Salvar</button>
+            <button type="button" class="secondary" id="btnCancelar" onclick="cancelarEdicao()" style="display:none">
+                Cancelar
+            </button>
+        </form>
+    </div>
+
+    <!-- LISTAGEM -->
+    <table>
+        <thead>
+            <tr>
+                <th>Máquina</th>
+                <th>Grupo</th>
+                <th>Galpão</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="listaMaquinas"></tbody>
+    </table>
+
+</div>
+
+<script>
+const galpaoSelect = document.getElementById("galpao");
+const grupoSelect = document.getElementById("grupo");
+const nomeInput = document.getElementById("nome");
+const maquinaIdInput = document.getElementById("maquinaId");
+const lista = document.getElementById("listaMaquinas");
+const titulo = document.getElementById("titulo");
+const btnCancelar = document.getElementById("btnCancelar");
+
+// CARREGAR GALPÕES
+async function carregarGalpoes() {
+    const res = await fetch("/api/galpoes");
+    const galpoes = await res.json();
+
+    galpaoSelect.innerHTML = `<option value="">Selecione o galpão</option>`;
+    galpoes.forEach(g => {
+        galpaoSelect.innerHTML += `<option value="${g.id}">${g.nome}</option>`;
+    });
+}
+
+// CARREGAR GRUPOS
+async function carregarGrupos(galpaoId) {
+    grupoSelect.innerHTML = `<option value="">Selecione o grupo</option>`;
+
+    if (!galpaoId) return;
+
+    const res = await fetch(`/api/grupos?galpao_id=${galpaoId}`);
+    const grupos = await res.json();
+
+    grupos.forEach(g => {
+        grupoSelect.innerHTML += `<option value="${g.id}">${g.nome}</option>`;
+    });
+}
+
+galpaoSelect.addEventListener("change", e => {
+    carregarGrupos(e.target.value);
+});
+
+// LISTAR MÁQUINAS
+async function carregarMaquinas() {
+    const res = await fetch("/api/maquinas");
+    const maquinas = await res.json();
+
+    lista.innerHTML = "";
+
+    maquinas.forEach(m => {
+        lista.innerHTML += `
+            <tr>
+                <td>${m.nome}</td>
+                <td>${m.grupo}</td>
+                <td>${m.galpao}</td>
+                <td class="actions">
+                    <button onclick="editar(${m.id}, ${m.galpao_id}, ${m.grupo_id}, '${m.nome}')">Editar</button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+// SALVAR / EDITAR
+document.getElementById("formMaquina").addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const data = {
+        galpao_id: galpaoSelect.value,
+        grupo_id: grupoSelect.value,
+        nome: nomeInput.value
+    };
+
+    let url = "/api/maquinas";
+    let method = "POST";
+
+    if (maquinaIdInput.value) {
+        url = `/api/maquinas/${maquinaIdInput.value}`;
+        method = "PUT";
+    }
+
+    const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        cancelarEdicao();
+        carregarMaquinas();
+    } else {
+        alert("Erro ao salvar máquina");
+    }
+});
+
+// EDITAR
+async function editar(id, galpaoId, grupoId, nome) {
+    maquinaIdInput.value = id;
+    titulo.innerText = "Editar Máquina";
+    btnCancelar.style.display = "inline-block";
+
+    await carregarGalpoes();
+    galpaoSelect.value = galpaoId;
+    await carregarGrupos(galpaoId);
+    grupoSelect.value = grupoId;
+    nomeInput.value = nome;
+}
+
+// CANCELAR
+function cancelarEdicao() {
+    document.getElementById("formMaquina").reset();
+    maquinaIdInput.value = "";
+    titulo.innerText = "Cadastro de Máquina";
+    btnCancelar.style.display = "none";
+}
+
+// INIT
+carregarGalpoes();
+carregarMaquinas();
+</script>
+
+</body>
+</html>
