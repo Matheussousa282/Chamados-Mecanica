@@ -1,6 +1,6 @@
-import pool from "../../lib/db";
+const pool = require("../lib/db");
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método não permitido" });
   }
@@ -31,10 +31,10 @@ export default async function handler(req, res) {
     return res.status(201).json(result.rows[0]);
 
   } catch (error) {
-    console.error("ERRO CHAMADO PRODUÇÃO:", error);
+    console.error("ERRO API /api/chamados:", error);
     return res.status(500).json({
-      error: "Erro interno ao criar chamado",
+      error: "Erro interno",
       detalhe: error.message
     });
   }
-}
+};
