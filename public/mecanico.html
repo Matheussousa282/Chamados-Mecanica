@@ -2,189 +2,304 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Gestão de Mecânicos</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadastro de Mecânicos</title>
 
 <style>
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
 body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #0f2027;
-    color: #fff;
+  margin: 0;
+  background: #eef1f5;
 }
 
-header {
-    background: #203a43;
-    padding: 15px 20px;
-    font-size: 20px;
-    font-weight: bold;
+.page {
+  max-width: 1100px;
+  margin: auto;
+  padding: 20px;
 }
 
-.container {
-    max-width: 900px;
-    margin: 20px auto;
-    background: #ffffff;
-    color: #333;
-    padding: 20px;
-    border-radius: 12px;
+.card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.08);
+  padding: 28px;
+  margin-bottom: 25px;
 }
 
-h2 {
-    margin-top: 0;
+.header h1 {
+  margin: 0;
+  font-size: 22px;
+  color: #1f2937;
 }
 
-.form {
-    display: grid;
-    grid-template-columns: 2fr 1fr auto;
-    gap: 10px;
-    margin-bottom: 20px;
+.header p {
+  margin: 6px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.form-grid {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
 }
 
 input, select {
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 14px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+}
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-.btn-add {
-    background: #203a43;
-    color: #fff;
+button:hover {
+  background: #1e40af;
+}
+
+/* ================= LISTA ================= */
+
+.table-wrapper {
+  overflow-x: auto;
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 th, td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-    font-size: 14px;
+  padding: 14px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
 }
 
 th {
-    background: #f4f4f4;
+  background: #f9fafb;
+  text-align: left;
 }
 
-.status-ativo {
-    color: #2ecc71;
-    font-weight: bold;
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
 }
 
-.status-inativo {
-    color: #e74c3c;
-    font-weight: bold;
+.status.ativo {
+  background: #dcfce7;
+  color: #166534;
 }
 
-.btn-ativar {
-    background: #2ecc71;
-    color: #fff;
+.status.inativo {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
-.btn-inativar {
-    background: #e74c3c;
-    color: #fff;
+/* =============== MOBILE ================= */
+@media (max-width: 900px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    justify-content: stretch;
+  }
+
+  button {
+    width: 100%;
+  }
 }
 </style>
 </head>
-
 <body>
 
-<header>🧑‍🔧 Gestão de Mecânicos</header>
+<div class="page">
 
-<div class="container">
-    <h2>Cadastrar Mecânico</h2>
-
-    <div class="form">
-        <input type="text" id="nome" placeholder="Nome do mecânico">
-        <select id="funcao">
-            <option value="">Função</option>
-            <option>Costura</option>
-            <option>Corte</option>
-            <option>Geral</option>
-        </select>
-        <button class="btn-add" onclick="cadastrar()">Adicionar</button>
+  <!-- ================= CADASTRO ================= -->
+  <div class="card">
+    <div class="header">
+      <h1>Cadastro de Mecânicos</h1>
+      <p>Preencha os dados do mecânico</p>
     </div>
 
-    <h2>Lista de Mecânicos</h2>
+    <form id="formMecanico">
+      <div class="form-grid">
 
-    <table>
+        <div class="form-group">
+          <label>Nome</label>
+          <input type="text" id="nome" required>
+        </div>
+
+        <div class="form-group">
+          <label>Matrícula</label>
+          <input type="text" id="matricula" required>
+        </div>
+
+        <div class="form-group">
+          <label>Telefone</label>
+          <input type="text" id="telefone">
+        </div>
+
+        <div class="form-group">
+          <label>Especialidade</label>
+          <select id="especialidade" required>
+            <option value="">Selecione</option>
+            <option>Mecânica Geral</option>
+            <option>Elétrica</option>
+            <option>Hidráulica</option>
+            <option>Automação</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Turno</label>
+          <select id="turno" required>
+            <option value="">Selecione</option>
+            <option>Manhã</option>
+            <option>Tarde</option>
+            <option>Noite</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <select id="status">
+            <option value="Ativo">Ativo</option>
+            <option value="Inativo">Inativo</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="actions">
+        <button type="submit">Cadastrar Mecânico</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ================= LISTA ================= -->
+  <div class="card">
+    <div class="header">
+      <h1>Lista de Mecânicos</h1>
+      <p>Mecânicos cadastrados no sistema</p>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
         <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Função</th>
-                <th>Status</th>
-                <th>Ações</th>
-            </tr>
+          <tr>
+            <th>Nome</th>
+            <th>Matrícula</th>
+            <th>Especialidade</th>
+            <th>Turno</th>
+            <th>Status</th>
+          </tr>
         </thead>
-        <tbody id="lista"></tbody>
-    </table>
+        <tbody id="listaMecanicos"></tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <script>
-let mecanicos = [];
+const form = document.getElementById("formMecanico");
+const tbody = document.getElementById("listaMecanicos");
 
-function cadastrar() {
-    const nome = document.getElementById("nome").value.trim();
-    const funcao = document.getElementById("funcao").value;
+// ================= LISTAR =================
+async function carregarMecanicos() {
+  const res = await fetch("/api/mecanicos");
+  const dados = await res.json();
 
-    if (!nome || !funcao) {
-        alert("Preencha nome e função");
-        return;
-    }
+  tbody.innerHTML = "";
 
-    mecanicos.push({
-        nome,
-        funcao,
-        ativo: true
-    });
-
-    document.getElementById("nome").value = "";
-    document.getElementById("funcao").value = "";
-
-    render();
+  dados.forEach(m => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${m.nome}</td>
+        <td>${m.matricula}</td>
+        <td>${m.especialidade}</td>
+        <td>${m.turno}</td>
+        <td>
+          <span class="status ${m.status.toLowerCase()}">
+            ${m.status}
+          </span>
+        </td>
+      </tr>
+    `;
+  });
 }
 
-function alternarStatus(index) {
-    mecanicos[index].ativo = !mecanicos[index].ativo;
-    render();
-}
+// ================= CADASTRAR =================
+form.addEventListener("submit", async e => {
+  e.preventDefault();
 
-function render() {
-    const lista = document.getElementById("lista");
-    lista.innerHTML = "";
+  const data = {
+    nome: nome.value,
+    matricula: matricula.value,
+    telefone: telefone.value,
+    especialidade: especialidade.value,
+    turno: turno.value,
+    status: status.value
+  };
 
-    mecanicos.forEach((m, i) => {
-        lista.innerHTML += `
-            <tr>
-                <td>${m.nome}</td>
-                <td>${m.funcao}</td>
-                <td class="${m.ativo ? 'status-ativo' : 'status-inativo'}">
-                    ${m.ativo ? 'ATIVO' : 'INATIVO'}
-                </td>
-                <td>
-                    <button 
-                        class="${m.ativo ? 'btn-inativar' : 'btn-ativar'}"
-                        onclick="alternarStatus(${i})">
-                        ${m.ativo ? 'Inativar' : 'Ativar'}
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
-}
+  const res = await fetch("/api/mecanicos", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
 
-render();
+  const result = await res.json();
+
+  if (res.ok) {
+    alert("Mecânico cadastrado com sucesso!");
+    form.reset();
+    carregarMecanicos();
+  } else {
+    alert(result.error || "Erro ao cadastrar");
+  }
+});
+
+// INIT
+carregarMecanicos();
 </script>
 
 </body>
