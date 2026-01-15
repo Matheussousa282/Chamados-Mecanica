@@ -65,7 +65,7 @@ header h1 {
 
 .filtro-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr) auto;
+    grid-template-columns: repeat(3, 1fr) auto;
     gap: 14px;
 }
 
@@ -98,7 +98,7 @@ header h1 {
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 1100px;
+    min-width: 1000px;
 }
 
 th, td {
@@ -156,7 +156,6 @@ tr.novo {
             <input type="text" id="filtroSupervisor" placeholder="Supervisor">
             <input type="text" id="filtroGalpao" placeholder="Galpão">
             <input type="text" id="filtroMaquina" placeholder="Máquina">
-            <input type="text" id="filtroMecanico" placeholder="Mecânico">
             <button onclick="exportarPDF()">📄 Exportar PDF</button>
         </div>
     </div>
@@ -171,7 +170,6 @@ tr.novo {
                         <th>Galpão</th>
                         <th>Grupo</th>
                         <th>Máquina</th>
-                        <th>Mecânico</th>
                         <th>Descrição</th>
                         <th>Data</th>
                     </tr>
@@ -219,7 +217,6 @@ function renderizarChamados(lista) {
             <td>${chamado.galpao}</td>
             <td>${chamado.grupo}</td>
             <td>${chamado.maquina}</td>
-            <td>${chamado.mecanico || "Não atribuído"}</td>
             <td>${chamado.descricao}</td>
             <td>${new Date(chamado.criado_em).toLocaleString()}</td>
         `;
@@ -241,13 +238,11 @@ function aplicarFiltros() {
     const sup = filtroSupervisor.value.toLowerCase();
     const gal = filtroGalpao.value.toLowerCase();
     const maq = filtroMaquina.value.toLowerCase();
-    const mec = filtroMecanico.value.toLowerCase();
 
     const filtrados = chamadosGlobais.filter(c =>
         c.supervisor.toLowerCase().includes(sup) &&
         c.galpao.toLowerCase().includes(gal) &&
-        c.maquina.toLowerCase().includes(maq) &&
-        (c.mecanico || "").toLowerCase().includes(mec)
+        c.maquina.toLowerCase().includes(maq)
     );
 
     renderizarChamados(filtrados);
@@ -256,7 +251,6 @@ function aplicarFiltros() {
 filtroSupervisor.addEventListener("input", aplicarFiltros);
 filtroGalpao.addEventListener("input", aplicarFiltros);
 filtroMaquina.addEventListener("input", aplicarFiltros);
-filtroMecanico.addEventListener("input", aplicarFiltros);
 
 /* ================= PDF ================= */
 function exportarPDF() {
@@ -273,8 +267,8 @@ function exportarPDF() {
 /* ================= ALERTA ================= */
 function dispararAlerta(chamado) {
     if (Notification.permission === "granted") {
-        new Notification("📢 Novo Chamado", {
-            body: `Máquina: ${chamado.maquina} | Mecânico: ${chamado.mecanico || "Não atribuído"}`
+        new Notification("📢 Novo Chamado de Produção", {
+            body: `Máquina: ${chamado.maquina} | Galpão: ${chamado.galpao}`
         });
     }
 
