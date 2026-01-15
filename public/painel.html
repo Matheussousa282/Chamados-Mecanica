@@ -231,7 +231,7 @@ async function finalizarChamado() {
         return;
     }
 
-    await fetch("/api/chamados/finalizar", {
+    await fetch("/api/finalizar", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
