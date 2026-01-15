@@ -190,16 +190,6 @@ th {
         </div>
 
         <div class="form-group">
-          <label>Turno</label>
-          <select id="turno" required>
-            <option value="">Selecione</option>
-            <option>Manhã</option>
-            <option>Tarde</option>
-            <option>Noite</option>
-          </select>
-        </div>
-
-        <div class="form-group">
           <label>Status</label>
           <select id="status">
             <option value="Ativo">Ativo</option>
@@ -229,7 +219,6 @@ th {
             <th>Nome</th>
             <th>Matrícula</th>
             <th>Especialidade</th>
-            <th>Turno</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -257,7 +246,6 @@ async function carregarMecanicos() {
         <td>${m.nome}</td>
         <td>${m.matricula}</td>
         <td>${m.especialidade}</td>
-        <td>${m.turno}</td>
         <td>
           <span class="status ${m.status.toLowerCase()}">
             ${m.status}
@@ -277,7 +265,6 @@ form.addEventListener("submit", async e => {
     matricula: matricula.value,
     telefone: telefone.value,
     especialidade: especialidade.value,
-    turno: turno.value,
     status: status.value
   };
 
