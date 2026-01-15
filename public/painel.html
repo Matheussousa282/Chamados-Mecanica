@@ -10,6 +10,7 @@
     --bg: #eef1f5;
     --card: #ffffff;
     --primary: #2563eb;
+    --danger: #dc2626;
     --text: #1f2937;
     --muted: #6b7280;
     --border: #e5e7eb;
@@ -24,73 +25,29 @@
 body {
     margin: 0;
     background: var(--bg);
-    color: var(--text);
 }
 
-/* ================= HEADER ================= */
+/* HEADER */
 header {
     background: var(--card);
     border-bottom: 1px solid var(--border);
     padding: 16px 20px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
 }
 
-header h1 {
-    margin: 0;
-    font-size: 20px;
-}
-
-/* ================= CONTAINER ================= */
 .container {
-    max-width: 1400px;
+    max-width: 1500px;
     margin: auto;
     padding: 20px;
 }
 
-/* ================= CARD ================= */
 .card {
     background: var(--card);
     border-radius: 14px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     overflow: hidden;
-    margin-bottom: 20px;
 }
 
-/* ================= FILTROS ================= */
-.filtros {
-    padding: 16px;
-}
-
-.filtro-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr) auto;
-    gap: 14px;
-}
-
-.filtro-grid input {
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    font-size: 14px;
-}
-
-.filtro-grid button {
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    padding: 12px 22px;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.filtro-grid button:hover {
-    background: #1e40af;
-}
-
-/* ================= TABLE ================= */
+/* TABLE */
 .table-wrapper {
     overflow-x: auto;
 }
@@ -98,47 +55,89 @@ header h1 {
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 1000px;
+    min-width: 1200px;
 }
 
 th, td {
     padding: 14px;
-    text-align: left;
     font-size: 14px;
     border-bottom: 1px solid var(--border);
 }
 
 th {
     background: #f9fafb;
-    font-weight: 600;
     color: var(--muted);
-}
-
-tr:hover {
-    background: #f3f4f6;
 }
 
 tr.novo {
     background: var(--novo);
-    animation: pulse 1.5s infinite;
 }
 
-/* ================= ANIMATION ================= */
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.6; }
-    100% { opacity: 1; }
+button.finalizar {
+    background: var(--danger);
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
-/* ================= MOBILE ================= */
-@media (max-width: 900px) {
-    .filtro-grid {
-        grid-template-columns: 1fr;
-    }
+/* MODAL */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
 
-    table {
-        min-width: 100%;
-    }
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 500px;
+    padding: 24px;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+}
+
+.modal-content input,
+.modal-content textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-actions button {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.salvar {
+    background: var(--primary);
+    color: #fff;
+}
+
+.cancelar {
+    background: #9ca3af;
+    color: #fff;
 }
 </style>
 </head>
@@ -149,18 +148,6 @@ tr.novo {
 </header>
 
 <div class="container">
-
-    <!-- FILTROS -->
-    <div class="card filtros">
-        <div class="filtro-grid">
-            <input type="text" id="filtroSupervisor" placeholder="Supervisor">
-            <input type="text" id="filtroGalpao" placeholder="Galpão">
-            <input type="text" id="filtroMaquina" placeholder="Máquina">
-            <button onclick="exportarPDF()">📄 Exportar PDF</button>
-        </div>
-    </div>
-
-    <!-- TABELA -->
     <div class="card">
         <div class="table-wrapper">
             <table>
@@ -172,131 +159,90 @@ tr.novo {
                         <th>Máquina</th>
                         <th>Descrição</th>
                         <th>Data</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody id="listaChamados"></tbody>
             </table>
         </div>
     </div>
-
 </div>
 
-<audio id="alertSound" src="/sounds/chamado.mp3" preload="auto"></audio>
+<!-- MODAL FINALIZAR -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <h2>Finalizar Atendimento</h2>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+        <input type="text" id="mecanico" placeholder="Nome do mecânico" required>
+        <textarea id="solucao" placeholder="Descreva o que foi feito" required></textarea>
+
+        <div class="modal-actions">
+            <button class="cancelar" onclick="fecharModal()">Cancelar</button>
+            <button class="salvar" onclick="finalizarChamado()">Concluir</button>
+        </div>
+    </div>
+</div>
 
 <script>
-let ultimoChamadoId = null;
-let chamadosGlobais = [];
-let audioLiberado = false;
+let chamadoSelecionado = null;
 
-const audio = document.getElementById("alertSound");
-audio.volume = 1.0;
-
-/* ================= CARREGAR ================= */
 async function carregarChamados() {
     const res = await fetch("/api/listar");
-    chamadosGlobais = await res.json();
-    renderizarChamados(chamadosGlobais);
-}
+    const chamados = await res.json();
 
-/* ================= RENDER ================= */
-function renderizarChamados(lista) {
     const tbody = document.getElementById("listaChamados");
     tbody.innerHTML = "";
 
-    lista.forEach(chamado => {
-        const tr = document.createElement("tr");
-
-        if (ultimoChamadoId && chamado.id > ultimoChamadoId) {
-            tr.classList.add("novo");
-        }
-
-        tr.innerHTML = `
-            <td>${chamado.supervisor}</td>
-            <td>${chamado.galpao}</td>
-            <td>${chamado.grupo}</td>
-            <td>${chamado.maquina}</td>
-            <td>${chamado.descricao}</td>
-            <td>${new Date(chamado.criado_em).toLocaleString()}</td>
+    chamados
+      .filter(c => c.status !== "Finalizado")
+      .forEach(c => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${c.supervisor}</td>
+                <td>${c.galpao}</td>
+                <td>${c.grupo}</td>
+                <td>${c.maquina}</td>
+                <td>${c.descricao}</td>
+                <td>${new Date(c.criado_em).toLocaleString()}</td>
+                <td>
+                    <button class="finalizar" onclick="abrirModal(${c.id})">
+                        Finalizar
+                    </button>
+                </td>
+            </tr>
         `;
+    });
+}
 
-        tbody.appendChild(tr);
+function abrirModal(id) {
+    chamadoSelecionado = id;
+    document.getElementById("modal").classList.add("active");
+}
+
+function fecharModal() {
+    document.getElementById("modal").classList.remove("active");
+    mecanico.value = "";
+    solucao.value = "";
+}
+
+async function finalizarChamado() {
+    if (!mecanico.value || !solucao.value) {
+        alert("Preencha todos os campos");
+        return;
+    }
+
+    await fetch("/api/chamados/finalizar", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            id: chamadoSelecionado,
+            mecanico: mecanico.value,
+            solucao: solucao.value
+        })
     });
 
-    if (lista.length > 0) {
-        const maisRecente = lista[0];
-        if (ultimoChamadoId && maisRecente.id > ultimoChamadoId) {
-            dispararAlerta(maisRecente);
-        }
-        ultimoChamadoId = maisRecente.id;
-    }
-}
-
-/* ================= FILTROS ================= */
-function aplicarFiltros() {
-    const sup = filtroSupervisor.value.toLowerCase();
-    const gal = filtroGalpao.value.toLowerCase();
-    const maq = filtroMaquina.value.toLowerCase();
-
-    const filtrados = chamadosGlobais.filter(c =>
-        c.supervisor.toLowerCase().includes(sup) &&
-        c.galpao.toLowerCase().includes(gal) &&
-        c.maquina.toLowerCase().includes(maq)
-    );
-
-    renderizarChamados(filtrados);
-}
-
-filtroSupervisor.addEventListener("input", aplicarFiltros);
-filtroGalpao.addEventListener("input", aplicarFiltros);
-filtroMaquina.addEventListener("input", aplicarFiltros);
-
-/* ================= PDF ================= */
-function exportarPDF() {
-    const element = document.querySelector(".table-wrapper");
-
-    html2pdf().set({
-        margin: 0.5,
-        filename: "chamados-producao.pdf",
-        html2canvas: { scale: 2 },
-        jsPDF: { orientation: "landscape", format: "a4" }
-    }).from(element).save();
-}
-
-/* ================= ALERTA ================= */
-function dispararAlerta(chamado) {
-    if (Notification.permission === "granted") {
-        new Notification("📢 Novo Chamado de Produção", {
-            body: `Máquina: ${chamado.maquina} | Galpão: ${chamado.galpao}`
-        });
-    }
-
-    if (audioLiberado) repetirSom(3, 3000);
-}
-
-function repetirSom(vezes, intervalo) {
-    let count = 0;
-    const timer = setInterval(() => {
-        audio.currentTime = 0;
-        audio.play().catch(() => {});
-        count++;
-        if (count >= vezes) clearInterval(timer);
-    }, intervalo);
-}
-
-document.addEventListener("click", () => {
-    if (!audioLiberado) {
-        audio.play().then(() => {
-            audio.pause();
-            audio.currentTime = 0;
-            audioLiberado = true;
-        }).catch(() => {});
-    }
-}, { once: true });
-
-if (Notification.permission !== "granted") {
-    Notification.requestPermission();
+    fecharModal();
+    carregarChamados();
 }
 
 carregarChamados();
