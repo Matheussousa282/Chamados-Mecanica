@@ -44,7 +44,7 @@ header h1 {
 
 /* ================= CONTAINER ================= */
 .container {
-    max-width: 1300px;
+    max-width: 1400px;
     margin: auto;
     padding: 20px;
 }
@@ -55,6 +55,39 @@ header h1 {
     border-radius: 14px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     overflow: hidden;
+    margin-bottom: 20px;
+}
+
+/* ================= FILTROS ================= */
+.filtros {
+    padding: 16px;
+}
+
+.filtro-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) auto;
+    gap: 14px;
+}
+
+.filtro-grid input {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 14px;
+}
+
+.filtro-grid button {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.filtro-grid button:hover {
+    background: #1e40af;
 }
 
 /* ================= TABLE ================= */
@@ -65,7 +98,7 @@ header h1 {
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 900px;
+    min-width: 1100px;
 }
 
 th, td {
@@ -98,17 +131,14 @@ tr.novo {
 }
 
 /* ================= MOBILE ================= */
-@media (max-width: 768px) {
-
-    header h1 {
-        font-size: 18px;
+@media (max-width: 900px) {
+    .filtro-grid {
+        grid-template-columns: 1fr;
     }
 
-    th, td {
-        padding: 12px;
-        font-size: 13px;
+    table {
+        min-width: 100%;
     }
-
 }
 </style>
 </head>
@@ -119,6 +149,19 @@ tr.novo {
 </header>
 
 <div class="container">
+
+    <!-- FILTROS -->
+    <div class="card filtros">
+        <div class="filtro-grid">
+            <input type="text" id="filtroSupervisor" placeholder="Supervisor">
+            <input type="text" id="filtroGalpao" placeholder="Galpão">
+            <input type="text" id="filtroMaquina" placeholder="Máquina">
+            <input type="text" id="filtroMecanico" placeholder="Mecânico">
+            <button onclick="exportarPDF()">📄 Exportar PDF</button>
+        </div>
+    </div>
+
+    <!-- TABELA -->
     <div class="card">
         <div class="table-wrapper">
             <table>
@@ -128,6 +171,7 @@ tr.novo {
                         <th>Galpão</th>
                         <th>Grupo</th>
                         <th>Máquina</th>
+                        <th>Mecânico</th>
                         <th>Descrição</th>
                         <th>Data</th>
                     </tr>
@@ -136,26 +180,34 @@ tr.novo {
             </table>
         </div>
     </div>
+
 </div>
 
 <audio id="alertSound" src="/sounds/chamado.mp3" preload="auto"></audio>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 <script>
 let ultimoChamadoId = null;
+let chamadosGlobais = [];
 let audioLiberado = false;
 
 const audio = document.getElementById("alertSound");
 audio.volume = 1.0;
 
-// ================= CARREGAR CHAMADOS =================
+/* ================= CARREGAR ================= */
 async function carregarChamados() {
     const res = await fetch("/api/listar");
-    const chamados = await res.json();
+    chamadosGlobais = await res.json();
+    renderizarChamados(chamadosGlobais);
+}
 
+/* ================= RENDER ================= */
+function renderizarChamados(lista) {
     const tbody = document.getElementById("listaChamados");
     tbody.innerHTML = "";
 
-    chamados.forEach(chamado => {
+    lista.forEach(chamado => {
         const tr = document.createElement("tr");
 
         if (ultimoChamadoId && chamado.id > ultimoChamadoId) {
@@ -167,6 +219,7 @@ async function carregarChamados() {
             <td>${chamado.galpao}</td>
             <td>${chamado.grupo}</td>
             <td>${chamado.maquina}</td>
+            <td>${chamado.mecanico || "Não atribuído"}</td>
             <td>${chamado.descricao}</td>
             <td>${new Date(chamado.criado_em).toLocaleString()}</td>
         `;
@@ -174,45 +227,70 @@ async function carregarChamados() {
         tbody.appendChild(tr);
     });
 
-    if (chamados.length > 0) {
-        const maisRecente = chamados[0];
-
+    if (lista.length > 0) {
+        const maisRecente = lista[0];
         if (ultimoChamadoId && maisRecente.id > ultimoChamadoId) {
             dispararAlerta(maisRecente);
         }
-
         ultimoChamadoId = maisRecente.id;
     }
 }
 
-// ================= ALERTA =================
-function dispararAlerta(chamado) {
+/* ================= FILTROS ================= */
+function aplicarFiltros() {
+    const sup = filtroSupervisor.value.toLowerCase();
+    const gal = filtroGalpao.value.toLowerCase();
+    const maq = filtroMaquina.value.toLowerCase();
+    const mec = filtroMecanico.value.toLowerCase();
 
+    const filtrados = chamadosGlobais.filter(c =>
+        c.supervisor.toLowerCase().includes(sup) &&
+        c.galpao.toLowerCase().includes(gal) &&
+        c.maquina.toLowerCase().includes(maq) &&
+        (c.mecanico || "").toLowerCase().includes(mec)
+    );
+
+    renderizarChamados(filtrados);
+}
+
+filtroSupervisor.addEventListener("input", aplicarFiltros);
+filtroGalpao.addEventListener("input", aplicarFiltros);
+filtroMaquina.addEventListener("input", aplicarFiltros);
+filtroMecanico.addEventListener("input", aplicarFiltros);
+
+/* ================= PDF ================= */
+function exportarPDF() {
+    const element = document.querySelector(".table-wrapper");
+
+    html2pdf().set({
+        margin: 0.5,
+        filename: "chamados-producao.pdf",
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: "landscape", format: "a4" }
+    }).from(element).save();
+}
+
+/* ================= ALERTA ================= */
+function dispararAlerta(chamado) {
     if (Notification.permission === "granted") {
-        new Notification("📢 Novo Chamado de Produção", {
-            body: `Máquina: ${chamado.maquina} | Galpão: ${chamado.galpao}`,
+        new Notification("📢 Novo Chamado", {
+            body: `Máquina: ${chamado.maquina} | Mecânico: ${chamado.mecanico || "Não atribuído"}`
         });
     }
 
-    if (audioLiberado) {
-        repetirSom(3, 3000);
-    }
+    if (audioLiberado) repetirSom(3, 3000);
 }
 
-// ================= SOM REPETIDO =================
 function repetirSom(vezes, intervalo) {
     let count = 0;
-
     const timer = setInterval(() => {
         audio.currentTime = 0;
         audio.play().catch(() => {});
         count++;
-
         if (count >= vezes) clearInterval(timer);
     }, intervalo);
 }
 
-// ================= LIBERAR AUDIO =================
 document.addEventListener("click", () => {
     if (!audioLiberado) {
         audio.play().then(() => {
@@ -223,7 +301,6 @@ document.addEventListener("click", () => {
     }
 }, { once: true });
 
-// ================= NOTIFICAÇÃO =================
 if (Notification.permission !== "granted") {
     Notification.requestPermission();
 }
